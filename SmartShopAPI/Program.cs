@@ -1,5 +1,9 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
+using SmartShopAPI.Data;
 
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<SmartShopDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SmartShopDbConnection")));
 // Add services to the container.
 
 builder.Services.AddControllers();
