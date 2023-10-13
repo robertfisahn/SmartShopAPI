@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace SmartShopAPI.Models
 {
@@ -10,9 +11,9 @@ namespace SmartShopAPI.Models
         public decimal? Price { get; set;}
         public DateTime? CreatedDate { get; set; } = DateTime.Now;
         public DateTime? UpdatedDate { get; set; }
-
         public int StockQuantity { get; set; }
         public int CategoryId { get; set; }
+        [JsonIgnore]
         public virtual Category? Category { get; set; }
     }
 }
