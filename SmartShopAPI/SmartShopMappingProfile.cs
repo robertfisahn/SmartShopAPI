@@ -16,6 +16,7 @@ namespace SmartShopAPI
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
             CreateMap<ProductDto, Product>();
+            CreateMap<UpdateProductDto, Product>();
         }
     }
 }

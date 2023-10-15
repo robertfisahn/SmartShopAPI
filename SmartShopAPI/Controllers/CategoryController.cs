@@ -1,66 +1,62 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SmartShopAPI.Data;
-using SmartShopAPI.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using SmartShopAPI.Models.Dtos;
+using SmartShopAPI.Services;
 
-namespace SmartShopAPI.Controller
+namespace SmartShopAPI.Controllers
 {
-
     [Route("category")]
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly SmartShopDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly ICategoryService _categoryService;
         
-        public CategoryController(SmartShopDbContext dbContext, IMapper mapper)
+        public CategoryController(ICategoryService categoryService)
         {
-            _context = dbContext;
-            _mapper = mapper;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
+        [ProducesResponseType(200)]
         public ActionResult<IEnumerable<CategoryDto>> GetAll()
         {
-            var categories = _context.Categories
-                .Include(x => x.Products);
-            var dto = _mapper.Map<List<CategoryDto>>(categories);
-            return Ok(dto);
+            var categories = _categoryService.GetAll();
+            return Ok(categories);
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Category> GetCategory([FromRoute]int id)
+        [HttpGet("{categoryId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public ActionResult<CategoryDto> GetCategory([FromRoute]int categoryId)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            var category = _categoryService.GetCategory(categoryId);
             return Ok(category);
         }
 
         [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
         public ActionResult Create([FromBody]CreateCategoryDto dto) 
         {
-            var entityCategory = _mapper.Map<Category>(dto);
-            _context.Categories.Add(entityCategory);
-            _context.SaveChanges();
-            return Created($"category/{entityCategory.Id}", null);
+            var categoryId = _categoryService.Create(dto);
+            return Created($"category/{categoryId}", null);
         }
 
         [HttpDelete("{categoryId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public ActionResult Delete([FromRoute]int categoryId)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Id == categoryId);
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
+            _categoryService.Delete(categoryId);
             return NoContent();
         }
 
         [HttpPut("{categoryId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public ActionResult Update([FromRoute]int categoryId, [FromBody]UpdateCategoryDto dto)
         {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == categoryId);
-            _mapper.Map(dto, category);
-            _context.SaveChanges();
+            _categoryService.Update(categoryId, dto);
             return Ok();
         }
     }

@@ -1,78 +1,65 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using SmartShopAPI.Data;
-using SmartShopAPI.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using SmartShopAPI.Models.Dtos;
+using SmartShopAPI.Services;
 
-namespace SmartShopAPI.Controller
+namespace SmartShopAPI.Controllers
 {
     [Route("category/{categoryId}/product")]
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly SmartShopDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly IProductService _productService;
         
-        public ProductController(SmartShopDbContext dbContext, IMapper mapper)
+        public ProductController(IProductService productService)
         {
-            _context = dbContext;
-            _mapper = mapper;
+            _productService = productService;
         }
         
         [HttpGet]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public ActionResult<List<ProductDto>> Get([FromRoute]int categoryId)
         {
-            var category = _context.Categories
-                .Include(x => x.Products)
-                .FirstOrDefault(c => c.Id == categoryId);
-            var products = _mapper.Map<List<ProductDto>>(category.Products.ToList());
-            
+            var products = _productService.Get(categoryId);
             return Ok(products);
         }
 
         [HttpGet("{productId}")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
         public ActionResult<ProductDto> GetById([FromRoute]int categoryId, [FromRoute]int productId)
         {
-            var category = _context.Categories
-                .Include(x => x.Products)
-                .FirstOrDefault (c => c.Id == categoryId);
-            var product = category.Products.FirstOrDefault(x => x.Id == productId);
-            var dto = _mapper.Map<ProductDto>(product);
-            return Ok(dto);
+            var product = _productService.GetById(categoryId, productId);
+            return Ok(product);
         }
 
         [HttpPost(Name="CreateProduct")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public ActionResult Create([FromRoute]int categoryId, [FromBody]CreateProductDto dto)
         {
-            var product = _mapper.Map<Product>(dto);
-            product.CategoryId = categoryId;
-            _context.Products.Add(product);
-            _context.SaveChanges();
-            return Created($"category/{categoryId}/product/{product.Id}", null);
+            var productId = _productService.Create(categoryId, dto);
+            return Created($"category/{categoryId}/product/{productId}", null);
             //return CreatedAtRoute("CreateProduct", new { id = product.Id }, product);
         }
 
         [HttpDelete("{productId}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         public ActionResult Delete([FromRoute]int categoryId, [FromRoute]int productId)
         {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == categoryId);
-            var product = category.Products.FirstOrDefault(p  => p.Id == productId);
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            _productService.Delete(categoryId, productId);
             return NoContent();
         }
 
-        [HttpPatch("{productId}")]
-        public ActionResult Update([FromRoute]int productId, JsonPatchDocument<ProductDto> jsonDto)
+        [HttpPut("{productId}")]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public ActionResult Update([FromRoute]int productId, UpdateProductDto dto)
         {
-            var product = _context.Products.FirstOrDefault(x => x.Id == productId);
-            var dto = _mapper.Map<ProductDto>(product);
-            jsonDto.ApplyTo(dto, ModelState);
-            _mapper.Map(dto, product);
-            _context.SaveChanges();
+            _productService.Update(productId, dto);
             return NoContent();
         }
     }
