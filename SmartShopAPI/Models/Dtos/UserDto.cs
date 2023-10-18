@@ -1,0 +1,18 @@
+﻿using SmartShopAPI.Entities;
+using System.ComponentModel.DataAnnotations;
+
+namespace SmartShopAPI.Models.Dtos
+{
+    public class UserDto
+    {
+        public int Id { get; set; }
+        public string Email { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime? DateOfBirth { get; set; }
+        public string RoleName { get; set; }
+        public string City { get; set; }
+        public string Street { get; set; }
+        public string PostalCode { get; set; }
+    }
+}

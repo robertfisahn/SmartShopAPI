@@ -1,4 +1,5 @@
-﻿using SmartShopAPI.Models;
+﻿using SmartShopAPI.Entities;
+using SmartShopAPI.Models;
 
 namespace SmartShopAPI.Data
 {
@@ -24,8 +25,120 @@ namespace SmartShopAPI.Data
                 _context.AddRange(result);
                 _context.SaveChanges();
             }
+            if (!_context.Roles.Any())
+            {
+                var result = GetRoles();
+                _context.AddRange(result);
+                _context.SaveChanges();
+            }
+            if(!_context.Users.Any())
+            {
+                var result = GetUsers();
+                _context.AddRange(result);
+                _context.SaveChanges();
+            }
         }
-
+        public List<User> GetUsers()
+        {
+            var users = new List<User>
+            {
+                new User
+                {
+                    Email = "john.doe@example.com",
+                    PasswordHash = "hashed_password_1",
+                    FirstName = "John",
+                    LastName = "Doe",
+                    DateOfBirth = new DateTime(1990, 5, 15),
+                    RoleId = 2,
+                    Address = new Address
+                    {
+                        City = "Warsaw",
+                        Street = "Main St",
+                        PostalCode = "00-123"
+                    }
+                },
+                new User
+                {
+                    Email = "jane.smith@example.com",
+                    PasswordHash = "hashed_password_2",
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    DateOfBirth = new DateTime(1985, 8, 25),
+                    RoleId = 3,
+                    Address = new Address
+                    {
+                        City = "Krakow",
+                        Street = "Second St",
+                        PostalCode = "30-456"
+                    }
+                },
+                new User
+                {
+                    Email = "alice.johnson@example.com",
+                    PasswordHash = "hashed_password_3",
+                    FirstName = "Alice",
+                    LastName = "Johnson",
+                    DateOfBirth = new DateTime(1988, 3, 10),
+                    RoleId = 1,
+                    Address = new Address
+                    {
+                        City = "Poznan",
+                        Street = "Third St",
+                        PostalCode = "61-789"
+                    }
+                },
+                new User
+                {
+                    Email = "robert.wilson@example.com",
+                    PasswordHash = "hashed_password_4",
+                    FirstName = "Robert",
+                    LastName = "Wilson",
+                    DateOfBirth = new DateTime(1995, 11, 8),
+                    RoleId = 3,
+                    Address = new Address
+                    {
+                        City = "Wroclaw",
+                        Street = "Fourth St",
+                        PostalCode = "50-234"
+                    }
+                },
+                new User
+                {
+                    Email = "emily.brown@example.com",
+                    PasswordHash = "hashed_password_5",
+                    FirstName = "Emily",
+                    LastName = "Brown",
+                    DateOfBirth = new DateTime(1980, 7, 20),
+                    RoleId = 2,
+                    Address = new Address
+                    {
+                        City = "Lodz",
+                        Street = "Fifth St",
+                        PostalCode = "90-567"
+                    }
+                }
+            };
+            return users;
+        }
+        private IEnumerable<Role> GetRoles()
+        {
+            var roles = new List<Role>
+            {
+                new Role
+                {
+                    Name = "Admin"
+                },
+                new Role
+                {
+                    Name = "Manager"
+                },
+                new Role
+                {
+                    Name = "User"
+                }
+            };
+            return roles;
+        }
         private IEnumerable<Category> GetCategories()
         {
             var categories = new List<Category>

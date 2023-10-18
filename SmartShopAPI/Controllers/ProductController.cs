@@ -4,7 +4,7 @@ using SmartShopAPI.Services;
 
 namespace SmartShopAPI.Controllers
 {
-    [Route("category/{categoryId}/product")]
+    [Route("api/category/{categoryId}/product")]
     [ApiController]
     public class ProductController : ControllerBase
     {

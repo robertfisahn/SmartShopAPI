@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartShopAPI.Models.Dtos;
 using SmartShopAPI.Services;
 
 namespace SmartShopAPI.Controllers
 {
-    [Route("category")]
+    [Route("api/category")]
     [ApiController]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -17,6 +19,8 @@ namespace SmartShopAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [AllowAnonymous]
         public ActionResult<IEnumerable<CategoryDto>> GetAll()
         {
             var categories = _categoryService.GetAll();
@@ -25,7 +29,10 @@ namespace SmartShopAPI.Controllers
 
         [HttpGet("{categoryId}")]
         [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
         [ProducesResponseType(404)]
+        [Authorize(Roles = "CUSTOM")]
         public ActionResult<CategoryDto> GetCategory([FromRoute]int categoryId)
         {
             var category = _categoryService.GetCategory(categoryId);
