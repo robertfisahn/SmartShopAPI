@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using SmartShopAPI.Entities;
 using SmartShopAPI.Models;
-using SmartShopAPI.Models.Dtos;
+using SmartShopAPI.Models.Dtos.CartItem;
+using SmartShopAPI.Models.Dtos.Category;
+using SmartShopAPI.Models.Dtos.Product;
+using SmartShopAPI.Models.Dtos.User;
 
 namespace SmartShopAPI
 {
@@ -10,11 +13,11 @@ namespace SmartShopAPI
         public SmartShopMappingProfile()
         {
             CreateMap<Category, CategoryDto>();
-            CreateMap<UpdateCategoryDto, Category>();
-            CreateMap<CreateCategoryDto, Category>();
+            CreateMap<CategoryUpsertDto, Category>();
+            CreateMap<CategoryUpsertDto, Category>();
             CreateMap<CreateProductDto, Product>();
             CreateMap<Product, ProductDto>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+                .ForMember(d => d.CategoryName, o => o.MapFrom(s => s.Category.Name));
             CreateMap<ProductDto, Product>();
             CreateMap<UpdateProductDto, Product>();
             CreateMap<User, UserDto>()
@@ -26,6 +29,12 @@ namespace SmartShopAPI
                 .ForPath(u => u.Address.City, d => d.MapFrom(r => r.City))
                 .ForPath(u => u.Address.Street, d => d.MapFrom(r => r.Street))
                 .ForPath(u => u.Address.PostalCode, d => d.MapFrom(r => r.PostalCode));
+            CreateMap<CreateCartDto, CartItem>();
+            CreateMap<CartItem, CartItemDto>()
+                .ForMember(d => d.ProductName, o => o.MapFrom(s => s.Product.Name));
+            CreateMap<CartItem, OrderItem>()
+                .ForMember(d => d.Id, o => o.Ignore());
+
         }
     }
 }

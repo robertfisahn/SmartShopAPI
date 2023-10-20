@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using SmartShopAPI.Models.Dtos;
+using SmartShopAPI.Models.Dtos.Product;
 
-namespace SmartShopAPI.Services
+namespace SmartShopAPI.Interfaces
 {
     public interface IProductService
     {

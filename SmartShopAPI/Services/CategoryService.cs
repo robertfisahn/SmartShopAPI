@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using SmartShopAPI.Data;
 using SmartShopAPI.Exceptions;
+using SmartShopAPI.Interfaces;
 using SmartShopAPI.Models;
-using SmartShopAPI.Models.Dtos;
+using SmartShopAPI.Models.Dtos.Category;
 
 namespace SmartShopAPI.Services
 {
@@ -33,7 +34,7 @@ namespace SmartShopAPI.Services
             var categoryDto = _mapper.Map<CategoryDto>(category);
             return categoryDto;
         }
-        public int Create(CreateCategoryDto dto)
+        public int Create(CategoryUpsertDto dto)
         {
             var entityCategory = _mapper.Map<Category>(dto);
             _context.Categories.Add(entityCategory);
@@ -47,7 +48,7 @@ namespace SmartShopAPI.Services
             _context.Categories.Remove(category);
             _context.SaveChanges();
         }
-        public void Update(int categoryId, UpdateCategoryDto dto)
+        public void Update(int categoryId, CategoryUpsertDto dto)
         {
             var category = _context.Categories
                 .FirstOrDefault(x => x.Id == categoryId) ?? throw new NotFoundException("Category not found");

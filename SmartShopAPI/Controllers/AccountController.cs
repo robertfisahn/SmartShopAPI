@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SmartShopAPI.Models.Dtos;
-using SmartShopAPI.Services;
+using SmartShopAPI.Interfaces;
+using SmartShopAPI.Models.Dtos.User;
 
 namespace SmartShopAPI.Controllers
 {

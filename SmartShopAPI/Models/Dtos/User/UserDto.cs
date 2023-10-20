@@ -1,7 +1,7 @@
 ﻿using SmartShopAPI.Entities;
 using System.ComponentModel.DataAnnotations;
 
-namespace SmartShopAPI.Models.Dtos
+namespace SmartShopAPI.Models.Dtos.User
 {
     public class UserDto
     {

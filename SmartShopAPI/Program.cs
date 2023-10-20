@@ -7,8 +7,10 @@ using Microsoft.OpenApi.Models;
 using SmartShopAPI;
 using SmartShopAPI.Data;
 using SmartShopAPI.Entities;
+using SmartShopAPI.Interfaces;
 using SmartShopAPI.Middleware;
-using SmartShopAPI.Models.Dtos;
+using SmartShopAPI.Models.Dtos.Product;
+using SmartShopAPI.Models.Dtos.User;
 using SmartShopAPI.Models.Validators;
 using SmartShopAPI.Services;
 using System.Text;
@@ -43,12 +45,19 @@ builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateProductDto>, CreateProductDtoValidator>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
-builder.Services.AddControllers().AddNewtonsoftJson().AddFluentValidation();
+builder.Services.AddControllers().AddNewtonsoftJson(options =>
+{
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+}).AddFluentValidation();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(options =>
 {
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

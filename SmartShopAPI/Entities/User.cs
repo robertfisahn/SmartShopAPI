@@ -6,6 +6,7 @@ namespace SmartShopAPI.Entities
     {
         public int Id { get; set; }
         [Required]
+        [EmailAddress]
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public string? FirstName { get; set; }
@@ -13,6 +14,9 @@ namespace SmartShopAPI.Entities
         public DateTime? DateOfBirth { get; set; }
         public int RoleId { get; set; }
         public virtual Role Role { get; set; }
+        public int? AddressId { get; set; }
         public virtual Address? Address { get; set; }
+        public virtual List<CartItem>? CartItems { get; set; }
+        public virtual List<Order>? Order { get; set; }
     }
 }

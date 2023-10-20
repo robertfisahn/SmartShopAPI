@@ -1,4 +1,4 @@
-﻿namespace SmartShopAPI.Models.Dtos
+﻿namespace SmartShopAPI.Models.Dtos.User
 {
     public class LoginDto
     {

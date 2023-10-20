@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SmartShopAPI.Models.Dtos;
-using SmartShopAPI.Services;
+using SmartShopAPI.Interfaces;
+using SmartShopAPI.Models.Dtos.Category;
 
 namespace SmartShopAPI.Controllers
 {
     [Route("api/category")]
     [ApiController]
-    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -19,8 +18,6 @@ namespace SmartShopAPI.Controllers
 
         [HttpGet]
         [ProducesResponseType(200)]
-        [ProducesResponseType(401)]
-        [AllowAnonymous]
         public ActionResult<IEnumerable<CategoryDto>> GetAll()
         {
             var categories = _categoryService.GetAll();
@@ -29,10 +26,7 @@ namespace SmartShopAPI.Controllers
 
         [HttpGet("{categoryId}")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(401)]
-        [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        [Authorize(Roles = "CUSTOM")]
         public ActionResult<CategoryDto> GetCategory([FromRoute]int categoryId)
         {
             var category = _categoryService.GetCategory(categoryId);
@@ -42,7 +36,9 @@ namespace SmartShopAPI.Controllers
         [HttpPost]
         [ProducesResponseType(201)]
         [ProducesResponseType(400)]
-        public ActionResult Create([FromBody]CreateCategoryDto dto) 
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
+        public ActionResult Create([FromBody]CategoryUpsertDto dto) 
         {
             var categoryId = _categoryService.Create(dto);
             return Created($"category/{categoryId}", null);
@@ -50,6 +46,8 @@ namespace SmartShopAPI.Controllers
 
         [HttpDelete("{categoryId}")]
         [ProducesResponseType(204)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
         [ProducesResponseType(404)]
         public ActionResult Delete([FromRoute]int categoryId)
         {
@@ -60,8 +58,10 @@ namespace SmartShopAPI.Controllers
         [HttpPut("{categoryId}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public ActionResult Update([FromRoute]int categoryId, [FromBody]UpdateCategoryDto dto)
+        public ActionResult Update([FromRoute]int categoryId, [FromBody]CategoryUpsertDto dto)
         {
             _categoryService.Update(categoryId, dto);
             return Ok();

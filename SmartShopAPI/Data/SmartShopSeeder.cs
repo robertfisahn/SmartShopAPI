@@ -37,7 +37,36 @@ namespace SmartShopAPI.Data
                 _context.AddRange(result);
                 _context.SaveChanges();
             }
+            //if (!_context.CartItems.Any())
+            //{
+            //    var result = GetCartItems();
+            //    _context.AddRange(result);
+            //    _context.SaveChanges();
+            //}
         }
+        //private IEnumerable<CartItem> GetCartItems()
+        //{
+        //    var cartItems = new List<CartItem>
+        //    {
+        //        new CartItem
+        //        {
+        //            Quantity = 2,
+        //            ProductId = 8,
+        //            UserId = 14
+        //        },
+        //        new CartItem
+        //        {
+        //            Quantity = 3,
+        //            ProductId = 9,
+        //            UserId = 15
+        //        },
+
+        //    };
+
+        //    return cartItems;
+        //}
+
+
         public List<User> GetUsers()
         {
             var users = new List<User>

@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SmartShopAPI.Models.Dtos
+namespace SmartShopAPI.Models.Dtos.Category
 {
-    public class CreateCategoryDto
+    public class CategoryUpsertDto
     {
         [Required]
         [MaxLength(25)]

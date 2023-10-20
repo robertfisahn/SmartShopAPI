@@ -1,4 +1,6 @@
-﻿namespace SmartShopAPI.Models.Dtos
+﻿using SmartShopAPI.Models.Dtos.Product;
+
+namespace SmartShopAPI.Models.Dtos.Category
 {
     public class CategoryDto
     {

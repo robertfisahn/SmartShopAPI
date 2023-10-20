@@ -13,10 +13,24 @@ namespace SmartShopAPI.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Address> Addresses { get; set; }
-
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<OrderItem>()
+                .Property(i => i.Quantity)
+                .IsRequired();
+
+            modelBuilder.Entity<CartItem>()
+                .Property(c => c.Quantity)
+                .IsRequired();
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.TotalPrice)
+                .IsRequired();
+
             modelBuilder.Entity<Address>(entity =>
             {
                 entity.Property(a => a.City)

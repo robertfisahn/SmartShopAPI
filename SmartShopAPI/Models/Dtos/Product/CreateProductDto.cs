@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SmartShopAPI.Models.Dtos
+namespace SmartShopAPI.Models.Dtos.Product
 {
     public class CreateProductDto
     {
