@@ -26,6 +26,13 @@ namespace SmartShopAPI.Middleware
                 var result = JsonConvert.SerializeObject(new { error = badRequestException.Message });
                 await context.Response.WriteAsync(result);
             }
+            catch(ForbidException forbidException)
+            {
+                context.Response.StatusCode = 403;
+                context.Response.ContentType= "application/json";
+                var result = JsonConvert.SerializeObject(new { error = forbidException.Message });
+                await context.Response.WriteAsync(result);
+            }
         }
 
     }

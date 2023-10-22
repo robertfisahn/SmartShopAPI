@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartShopAPI.Interfaces;
 using SmartShopAPI.Models.Dtos.Product;
 
@@ -6,6 +7,7 @@ namespace SmartShopAPI.Controllers
 {
     [Route("api/category/{categoryId}/product")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -16,6 +18,7 @@ namespace SmartShopAPI.Controllers
         }
         
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<List<ProductDto>> Get([FromRoute]int categoryId)
@@ -25,6 +28,7 @@ namespace SmartShopAPI.Controllers
         }
 
         [HttpGet("{productId}")]
+        [AllowAnonymous]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<ProductDto> GetById([FromRoute]int categoryId, [FromRoute]int productId)

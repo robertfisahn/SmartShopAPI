@@ -45,7 +45,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Addresses");
+                    b.ToTable("Addresses", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Entities.CartItem", b =>
@@ -71,7 +71,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Entities.Order", b =>
@@ -100,7 +100,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Entities.OrderItem", b =>
@@ -126,7 +126,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Entities.Role", b =>
@@ -144,7 +144,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Entities.User", b =>
@@ -187,7 +187,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Models.Category", b =>
@@ -205,7 +205,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Models.Product", b =>
@@ -245,7 +245,7 @@ namespace SmartShopAPI.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("SmartShopAPI.Entities.CartItem", b =>

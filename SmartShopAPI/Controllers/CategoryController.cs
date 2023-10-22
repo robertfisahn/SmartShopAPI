@@ -7,6 +7,7 @@ namespace SmartShopAPI.Controllers
 {
     [Route("api/category")]
     [ApiController]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
@@ -17,6 +18,7 @@ namespace SmartShopAPI.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [ProducesResponseType(200)]
         public ActionResult<IEnumerable<CategoryDto>> GetAll()
         {
@@ -25,6 +27,7 @@ namespace SmartShopAPI.Controllers
         }
 
         [HttpGet("{categoryId}")]
+        [AllowAnonymous]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public ActionResult<CategoryDto> GetCategory([FromRoute]int categoryId)

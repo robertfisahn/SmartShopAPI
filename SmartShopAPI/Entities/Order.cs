@@ -1,6 +1,8 @@
-﻿namespace SmartShopAPI.Entities
+﻿using SmartShopAPI.Interfaces;
+
+namespace SmartShopAPI.Entities
 {
-    public class Order
+    public class Order : IUserVerification
     {
         public int Id { get; set; }
         public decimal TotalPrice { get; set; }

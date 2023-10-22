@@ -1,8 +1,9 @@
-﻿using SmartShopAPI.Models;
+﻿using SmartShopAPI.Interfaces;
+using SmartShopAPI.Models;
 
 namespace SmartShopAPI.Entities
 {
-    public class CartItem
+    public class CartItem : IUserVerification
     {
         public int Id { get; set; }
         public int Quantity { get; set; }

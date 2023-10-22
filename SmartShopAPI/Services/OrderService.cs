@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using SmartShopAPI.Authorization;
 using SmartShopAPI.Data;
 using SmartShopAPI.Entities;
 using SmartShopAPI.Exceptions;
@@ -12,18 +14,27 @@ namespace SmartShopAPI.Services
         private readonly SmartShopDbContext _context;
         private readonly IMapper _mapper;
         private readonly IUserContextService _userContextService;
+        private readonly IAuthorizationService _authorizationService;
 
-        public OrderService(SmartShopDbContext context, IMapper mapper, IUserContextService userContextService)
+        public OrderService(SmartShopDbContext context, IMapper mapper, IUserContextService userContextService,
+            IAuthorizationService authorizationService)
         {
             _context = context;
             _mapper = mapper;
             _userContextService = userContextService;
+            _authorizationService = authorizationService;
         }
         public Order GetById(int orderId)
         {
             var order = _context.Orders
                 .Include(x => x.OrderItems)
                 .SingleOrDefault(o => o.Id == orderId) ?? throw new NotFoundException("Order not found");
+            var authorizationResult = _authorizationService.AuthorizeAsync(_userContextService.User, order,
+                new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException("Authorization failed");
+            }
             return order;
         }
         public int Create()

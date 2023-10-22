@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartShopAPI.Entities;
 using SmartShopAPI.Interfaces;
 
@@ -6,6 +7,7 @@ namespace SmartShopAPI.Controllers
 {
     [Route("/api/order")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;

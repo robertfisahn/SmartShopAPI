@@ -33,7 +33,7 @@ namespace SmartShopAPI.Services
         {
             var user = _mapper.Map<User>(dto);
             user.PasswordHash = _passwordHasher.HashPassword(user, dto.Password);
-            user.RoleId = 2;
+            user.RoleId = 3;
             _context.Users.Add(user);
             _context.SaveChanges();
         }

@@ -1,10 +1,12 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SmartShopAPI;
+using SmartShopAPI.Authorization;
 using SmartShopAPI.Data;
 using SmartShopAPI.Entities;
 using SmartShopAPI.Interfaces;
@@ -49,6 +51,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateProductDto>, CreateProductDtoValidator>();
+builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
 {
