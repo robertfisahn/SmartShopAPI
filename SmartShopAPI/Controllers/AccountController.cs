@@ -24,6 +24,7 @@ namespace SmartShopAPI.Controllers
         }
         [HttpPost("login")]
         [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public ActionResult Login([FromBody]LoginDto dto)
         {
             var token = _accountService.GenerateJwt(dto);
