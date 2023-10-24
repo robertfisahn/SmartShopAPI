@@ -11,6 +11,7 @@ using SmartShopAPI.Data;
 using SmartShopAPI.Entities;
 using SmartShopAPI.Interfaces;
 using SmartShopAPI.Middleware;
+using SmartShopAPI.Models.Dtos;
 using SmartShopAPI.Models.Dtos.Product;
 using SmartShopAPI.Models.Dtos.User;
 using SmartShopAPI.Models.Validators;
@@ -51,6 +52,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
 builder.Services.AddScoped<IValidator<CreateProductDto>, CreateProductDtoValidator>();
+builder.Services.AddScoped<IValidator<QueryParams>, QueryParamsValidator>();
 builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
 builder.Services.AddScoped<ErrorHandlingMiddleware>();
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
