@@ -24,6 +24,7 @@ namespace SmartShopAPI.Services
             _context = context;
             _mapper = mapper;
         }
+
         public PagedResult<ProductDto> Get(int categoryId, QueryParams query)
         {
             CheckCategory(categoryId);
@@ -35,6 +36,7 @@ namespace SmartShopAPI.Services
             var result =  new PagedResult<ProductDto>(dtos, totalItemsCount, query.PageSize, query.PageNumber);
             return result;
         }
+
         public ProductDto GetById(int categoryId, int productId)
         {
             CheckCategory(categoryId);
@@ -44,16 +46,17 @@ namespace SmartShopAPI.Services
             var productDto = _mapper.Map<ProductDto>(product);
             return productDto;
         }
+
         public int Create(int categoryId, CreateProductDto dto)
         {
-            var category = _context.Categories
-                .FirstOrDefault(x => x.Id == categoryId) ?? throw new NotFoundException("Category not found");
+            CheckCategory(categoryId);
             var product = _mapper.Map<Product>(dto);
             product.CategoryId = categoryId;
             _context.Products.Add(product);
             _context.SaveChanges();
             return product.Id;
         }
+
         public void Delete(int categoryId, int productId)
         {
             CheckCategory(categoryId);
@@ -63,6 +66,7 @@ namespace SmartShopAPI.Services
             _context.Products.Remove(product);
             _context.SaveChanges();
         }
+
         public void Update(int productId, UpdateProductDto dto)
         {
             var product = _context.Products
@@ -70,6 +74,7 @@ namespace SmartShopAPI.Services
             _mapper.Map(dto, product);
             _context.SaveChanges();
         }
+
         public void CheckCategory(int categoryId)
         {
             if(!_context.Categories.Any(x => x.Id == categoryId))
@@ -77,6 +82,7 @@ namespace SmartShopAPI.Services
                 throw new NotFoundException("Category not found");
             }
         }
+
         public IQueryable<Product> FilterProducts(int categoryId, string searchPhrase)
         {
             var products = _context.Products
@@ -84,6 +90,7 @@ namespace SmartShopAPI.Services
                 .Contains(searchPhrase, StringComparison.OrdinalIgnoreCase)));
             return products;
         }
+
         public IQueryable<Product> SortProducts(IQueryable<Product> products, SortOrder sortOrder, string sortBy)
         {
             if (!string.IsNullOrEmpty(sortBy))
@@ -108,6 +115,7 @@ namespace SmartShopAPI.Services
             }
             return products;
         }
+
         public List<Product> PaginateProducts(IQueryable<Product> products, int pageSize, int pageNumber)
         {
             var result = products
