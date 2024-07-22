@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Microsoft.IdentityModel.Tokens;
 using SmartShopAPI.Models.Dtos;
 
 namespace SmartShopAPI.Models.Validators
@@ -7,6 +6,7 @@ namespace SmartShopAPI.Models.Validators
     public class QueryParamsValidator : AbstractValidator<QueryParams>
     {
         private int[] allowedPageSizes = new[] { 10, 20, 30 };
+        private string[] allowedSortBy = new[] { "Name", "Price" };
         public QueryParamsValidator()
         {
             RuleFor(x => x.PageNumber).GreaterThanOrEqualTo(1);
@@ -15,6 +15,13 @@ namespace SmartShopAPI.Models.Validators
                 if(!allowedPageSizes.Contains(value))
                 {
                     context.AddFailure("PagesSizes", $"Page size must be one of the following values [{string.Join(", ", allowedPageSizes)}]");
+                }
+            });
+            RuleFor(x => x.SortBy).Custom((value, context) =>
+            {
+                if (!allowedSortBy.Contains(value))
+                {
+                    context.AddFailure($"Sort by must be one of the following values [{string.Join(", ", allowedSortBy)}]");
                 }
             });
         }

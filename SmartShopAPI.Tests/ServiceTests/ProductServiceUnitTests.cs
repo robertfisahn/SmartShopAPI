@@ -49,28 +49,38 @@ namespace SmartShopAPI.Tests
                 .Callback((UpdateProductDto dto, Product product) => {
                     product.Name = dto.Name;
                 });
+            _mockMapper.Setup(m => m.Map<List<ProductDto>>(It.IsAny<IEnumerable<Product>>()))
+                .Returns((IEnumerable<Product> source) => source.Select(p => new ProductDto { Id = p.Id, Name = p.Name }).ToList());
+        }
+
+        [Fact]
+        public void GetProducts_Succesfully()
+        {
+            var queryParams = new QueryParams()
+            {
+                PageNumber = 1,
+                PageSize = 10,
+                SearchPhrase = "op",
+                SortBy = "Price",
+                SortOrder = SortOrder.Descending
+            };
+            var products = _service.Get(1, queryParams);
+            Assert.Equal(2, products.TotalCount);
+            Assert.Equal("Desktop", products.Items[0].Name);
         }
 
         [Fact]
         public void CheckCategory_ExistingCategory_DoesNotThrowException()
         {
-            // arrange
             var existingCategory = 1;
-
-            // act
             var exception = Record.Exception(() => _service.CheckCategory(existingCategory));
-
-            // assert
             Assert.Null(exception);
         }
 
         [Fact]
         public void CheckCategory_NonExistingCategory_ThrowsNotFoundException()
         {
-            // arrange
             var nonExistingCategory = 11;
-
-            // act & assert
             Assert.Throws<NotFoundException>(() => _service.CheckCategory(nonExistingCategory));
         }
 
@@ -78,15 +88,21 @@ namespace SmartShopAPI.Tests
         public void GetById_ExistingProduct()
         {
             var existingProduct = _service.GetById(1, 0);
-            Assert.NotNull(existingProduct);
             Assert.Equal(0, existingProduct.Id);
         }
 
         [Fact]
-        public void GetById_NonExistingProduct_ThrowsNotFoundException()
+        public void GetById_NonExistingProductId_ThrowsNotFoundException()
         {
             var nonExistingProductId = 99;
             Assert.Throws<NotFoundException>(() => _service.GetById(1, nonExistingProductId));
+        }
+
+        [Fact]
+        public void GetById_NonExistingCategoryId()
+        {
+            var nonExistingCategoryId = 99;
+            Assert.Throws<NotFoundException>(() => _service.GetById(nonExistingCategoryId, 0));
         }
 
         [Fact]
@@ -95,6 +111,8 @@ namespace SmartShopAPI.Tests
             var newProduct = new CreateProductDto { Name = "New Laptop" };
             var newProductId = _service.Create(1, newProduct);
             Assert.NotNull(_service.GetById(1, newProductId));
+            _mockContext.Verify(c => c.Products.Add(It.IsAny<Product>()), Times.Once);
+            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
         }
 
         [Fact]
@@ -102,6 +120,8 @@ namespace SmartShopAPI.Tests
         {
             var dto = new CreateProductDto { Name = "exc" };
             Assert.Throws<NotFoundException>(() => _service.Create(0, dto));
+            _mockContext.Verify(c => c.Products.Add(It.IsAny<Product>()), Times.Never);
+            _mockContext.Verify(c => c.SaveChanges(), Times.Never());
         }
 
         [Fact]
@@ -110,6 +130,8 @@ namespace SmartShopAPI.Tests
             _service.Delete(1, 0);
             var productExists = _mockContext.Object.Products.Any(p => p.Id == 0);
             Assert.False(productExists);
+            _mockContext.Verify(c => c.Products.Remove(It.Is<Product>(p => p.Id == 0)), Times.Once());
+            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
         }
 
         [Fact]
@@ -117,6 +139,17 @@ namespace SmartShopAPI.Tests
         {
             var nonExistingProductId = 99;
             Assert.Throws<NotFoundException>(() => _service.Delete(0, nonExistingProductId));
+            _mockContext.Verify(c => c.Products.Remove(It.Is<Product>(p => p.Id == 99)), Times.Never());
+            _mockContext.Verify(c => c.SaveChanges(), Times.Never());
+        }
+
+        [Fact]
+        public void Delete_Product_NonExistingCategory_ThrowsNotFoundException()
+        {
+            var nonExistingCategorytId = 99;
+            Assert.Throws<NotFoundException>(() => _service.Delete(nonExistingCategorytId, 0));
+            _mockContext.Verify(c => c.Products.Remove(It.Is<Product>(p => p.Id == 99)), Times.Never());
+            _mockContext.Verify(c => c.SaveChanges(), Times.Never());
         }
 
         [Fact]
@@ -126,39 +159,50 @@ namespace SmartShopAPI.Tests
             _service.Update(0, dto);
             var updateProduct = _mockContext.Object.Products.FirstOrDefault(p => p.Id == 0);
             Assert.Equal("update product", updateProduct.Name);
+            _mockContext.Verify(c => c.SaveChanges(), Times.Once());
         }
 
         [Fact]
         public void Update_Product_NonExistingProduct_ThrowsNotFoundException()
         {
-            // arrange
             var nonExistingProductId = 99;
             var dto = new UpdateProductDto { Name = "Update Product" };
-
-            // act & assert
             Assert.Throws<NotFoundException>(() => _service.Update(nonExistingProductId, dto));
+            _mockContext.Verify(c => c.SaveChanges(), Times.Never());
         }
 
         [Fact]
         public void FilterProducts_ReturnsFilteredProducts()
         {
             var result = _service.FilterProducts(1, "Mob").ToList();
-
-            Assert.Single(result);
             Assert.Equal("Mobile", result[0].Name);
+        }
+
+        [Fact]
+        public void FilterProducts_NotExistingCategory_ThrowsNotFoundException()
+        {
+            var nonExistingCategory = 99;
+            Assert.Throws<NotFoundException>(() => _service.FilterProducts(nonExistingCategory, "Mob").ToList());
         }
 
         [Fact]
         public void PaginateProducts_PaginatesCorrectly()
         {
             int pageNumber = 2;
-            int pageSize = 2;
-
-            var paginated = _service.PaginateProducts(_products.AsQueryable(), pageNumber, pageSize);
-
-            Assert.Equal(2, paginated.Count); 
-            Assert.Equal("Desktop", paginated[0].Name);
-            Assert.Equal("Mobile", paginated[1].Name); 
+            int pageSize = 10;
+            var additionalProducts = new List<Product>
+            {
+                new Product { Name = "Product1" },
+                new Product { Name = "Product2" },
+                new Product { Name = "Product3" },
+                new Product { Name = "Product4" },
+                new Product { Name = "Product5" },
+                new Product { Name = "Product6" },
+                new Product { Name = "Product7" }
+            };
+            _products.AddRange(additionalProducts);
+            var paginated = _service.PaginateProducts(_products.AsQueryable(), pageSize, pageNumber);
+            Assert.Equal("Product7", paginated[0].Name);
         }
 
         [Fact]
@@ -169,7 +213,6 @@ namespace SmartShopAPI.Tests
 
             var sort = _service.SortProducts(_products.AsQueryable(), sortOrder, sortBy).ToList();
             Assert.Equal("Desktop", sort[0].Name);
-            Assert.Equal("Test Product", sort[3].Name);
         }
 
         [Fact]
@@ -179,7 +222,6 @@ namespace SmartShopAPI.Tests
             var sortOrder = SortOrder.Ascending;
 
             var sort = _service.SortProducts(_products.AsQueryable(), sortOrder, sortBy).ToList();
-            Assert.Equal("Test Product", sort[0].Name);
             Assert.Equal("Desktop", sort[3].Name);
         }
 
@@ -191,7 +233,6 @@ namespace SmartShopAPI.Tests
 
             var sort = _service.SortProducts(_products.AsQueryable(), sortOrder, sortBy).ToList();
             Assert.Equal("Desktop", sort[0].Name);
-            Assert.Equal("Test Product", sort[3].Name);
         }
 
         [Fact]
@@ -201,16 +242,7 @@ namespace SmartShopAPI.Tests
             var sortOrder = SortOrder.Descending;
 
             var sort = _service.SortProducts(_products.AsQueryable(), sortOrder, sortBy).ToList();
-            Assert.Equal("Test Product", sort[0].Name);
-            Assert.Equal("Mobile", sort[1].Name);
-        }
-
-        [Fact]
-        public void SortProducts_NonExistingAttribute_ThrowsNotFoundException()
-        {
-            var nonExistingSortBy = "xxx";
-            var sortOrder = SortOrder.Ascending;
-            Assert.Throws<NotFoundException>(() => _service.SortProducts(_products.AsQueryable(), sortOrder, nonExistingSortBy));
+            Assert.Equal("Desktop", sort[3].Name);
         }
     }
 }

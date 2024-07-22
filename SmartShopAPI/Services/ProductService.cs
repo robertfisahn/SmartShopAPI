@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SmartShopAPI.Data;
 using SmartShopAPI.Models;
 using SmartShopAPI.Exceptions;
@@ -8,9 +6,6 @@ using SmartShopAPI.Models.Dtos.Product;
 using SmartShopAPI.Interfaces;
 using SmartShopAPI.Models.Dtos;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using System.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SmartShopAPI.Services
 {
@@ -28,13 +23,13 @@ namespace SmartShopAPI.Services
         public PagedResult<ProductDto> Get(int categoryId, QueryParams query)
         {
             CheckCategory(categoryId);
+
             var filteredProducts = FilterProducts(categoryId, query.SearchPhrase);
-            var totalItemsCount = filteredProducts.Count();
-            var sortProducts = SortProducts(filteredProducts, query.SortOrder, query.SortBy);
-            var paginateProducts = PaginateProducts(sortProducts, query.PageSize, query.PageNumber);
-            var dtos = _mapper.Map<List<ProductDto>>(paginateProducts);
-            var result =  new PagedResult<ProductDto>(dtos, totalItemsCount, query.PageSize, query.PageNumber);
-            return result;
+            var paginatedAndSortedProducts = PaginateProducts(SortProducts(filteredProducts, query.SortOrder, query.SortBy),
+                query.PageSize, query.PageNumber);
+
+            var dtos = _mapper.Map<List<ProductDto>>(paginatedAndSortedProducts);
+            return new PagedResult<ProductDto>(dtos, filteredProducts.Count(), query.PageSize, query.PageNumber);
         }
 
         public ProductDto GetById(int categoryId, int productId)
@@ -43,8 +38,8 @@ namespace SmartShopAPI.Services
             var product = _context.Products
                 .Where(x => x.CategoryId == categoryId)
                 .FirstOrDefault(x => x.Id == productId) ?? throw new NotFoundException("Product not found");
-            var productDto = _mapper.Map<ProductDto>(product);
-            return productDto;
+
+            return _mapper.Map<ProductDto>(product);
         }
 
         public int Create(int categoryId, CreateProductDto dto)
@@ -85,9 +80,10 @@ namespace SmartShopAPI.Services
 
         public IQueryable<Product> FilterProducts(int categoryId, string searchPhrase)
         {
+            CheckCategory(categoryId);
             var products = _context.Products
-                .Where(x => x.CategoryId == categoryId && (searchPhrase == null || x.Name
-                .Contains(searchPhrase, StringComparison.OrdinalIgnoreCase)));
+                .Where(x => x.CategoryId == categoryId && (searchPhrase == null || x.Name.ToLower()
+                .Contains(searchPhrase.ToLower())));
             return products;
         }
 
@@ -101,17 +97,11 @@ namespace SmartShopAPI.Services
                     { nameof(Product.Price), r => r.Price }
                 };
 
-                if (columnSelector.TryGetValue(sortBy, out var selectedColumn))
-                {
-                    products = sortOrder == SortOrder.Ascending
-                        ? products.OrderBy(selectedColumn)
-                        : products.OrderByDescending(selectedColumn);
-                }
-                else
-                {
-                    var availableAttributes = string.Join(", ", columnSelector.Keys);
-                    throw new NotFoundException($"Attribute '{sortBy}' not found. Available attributes: {availableAttributes}.");
-                }
+                var selectedColumn = columnSelector[sortBy];
+
+                products = sortOrder == SortOrder.Ascending
+                    ? products.OrderBy(selectedColumn)
+                    : products.OrderByDescending(selectedColumn);
             }
             return products;
         }
