@@ -5,7 +5,7 @@ using SmartShopAPI.Interfaces;
 using SmartShopAPI.Models.Dtos;
 using SmartShopAPI.Models.Dtos.Product;
 
-namespace SmartShopAPI.Tests.ControllerTests
+namespace SmartShopAPI.Tests.UnitTests.ControllerTests
 {
     public class ProductControllerTests
     {

@@ -8,7 +8,7 @@ using SmartShopAPI.Data;
 using SmartShopAPI.Exceptions;
 using SmartShopAPI.Models.Dtos;
 
-namespace SmartShopAPI.Tests
+namespace SmartShopAPI.Tests.UnitTests.ServiceTests
 {
     public class ProductServiceUnitTests
     {
@@ -46,7 +46,8 @@ namespace SmartShopAPI.Tests
                 .Returns((CreateProductDto dto) => new Product { Name = dto.Name, CategoryId = 1 });
 
             _mockMapper.Setup(m => m.Map(It.IsAny<UpdateProductDto>(), It.IsAny<Product>()))
-                .Callback((UpdateProductDto dto, Product product) => {
+                .Callback((UpdateProductDto dto, Product product) =>
+                {
                     product.Name = dto.Name;
                 });
             _mockMapper.Setup(m => m.Map<List<ProductDto>>(It.IsAny<IEnumerable<Product>>()))

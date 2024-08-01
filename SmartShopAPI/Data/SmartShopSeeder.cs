@@ -1,4 +1,6 @@
-﻿using SmartShopAPI.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SmartShopAPI.Entities;
 using SmartShopAPI.Models;
 
 namespace SmartShopAPI.Data
@@ -6,225 +8,129 @@ namespace SmartShopAPI.Data
     public class SmartShopSeeder
     {
         private readonly SmartShopDbContext _context;
-        public SmartShopSeeder(SmartShopDbContext dbContext)
+        private readonly IPasswordHasher<User> _passwordHasher;
+
+        public SmartShopSeeder(SmartShopDbContext dbContext, IPasswordHasher<User> passwordHasher)
         {
             _context = dbContext;
+            _passwordHasher = passwordHasher;
         }
 
         public void Seed()
         {
-            if(!_context.Categories.Any())
+            SeedCategories();
+            SeedProducts();
+            SeedRoles();
+            SeedUsers();
+        }
+
+        private void SeedCategories()
+        {
+            if (!_context.Categories.Any())
             {
-                var result = GetCategories();
-                _context.AddRange(result);
+                var categories = new List<Category>
+                {
+                    new Category { Name = "Oleje silnikowe" },
+                    new Category { Name = "Klocki hamulcowe" },
+                    new Category { Name = "Tarcze hamulcowe" },
+                    new Category { Name = "Świece zapłonowe" },
+                    new Category { Name = "Paski rozrządu" },
+                    new Category { Name = "Opony" },
+                    new Category { Name = "Amortyzatory" },
+                    new Category { Name = "Akumulatory" },
+                    new Category { Name = "Filtry olejowe" },
+                    new Category { Name = "Części karoserii" }
+                };
+                _context.Categories.AddRange(categories);
                 _context.SaveChanges();
             }
+        }
+
+        private void SeedProducts()
+        {
             if (!_context.Products.Any())
             {
-                var result = GetProducts();
-                _context.AddRange(result);
+                var products = new List<Product>
+                {
+                    new Product { Name = "Olej Mannol 5w40", 
+                        Description = "Olej marki Mannol do samochodów osobowych", 
+                        Price = 49.99M, StockQuantity = 10, CategoryId = 1 },
+                    new Product { Name = "Olej Motul 5w30", 
+                        Description = "Olej marki Motul do samochodów osobowych", 
+                        Price = 59.99M, StockQuantity = 8, CategoryId = 1 },
+                    new Product { Name = "Klocki hamulcowe Brembo", 
+                        Description = "Klocki hamulcowe marki Brembo do samochodów sportowych", 
+                        Price = 129.99M, StockQuantity = 15, CategoryId = 2 },
+                    new Product { Name = "Tarcza hamulcowa ATE", 
+                        Description = "Tarcza hamulcowa marki ATE o średnicy 280mm", 
+                        Price = 199.99M, StockQuantity = 5, CategoryId = 2 },
+                    new Product { Name = "Świeca zapłonowa NGK", 
+                        Description = "Świeca zapłonowa marki NGK do silników benzynowych", 
+                        Price = 14.99M, StockQuantity = 20, CategoryId = 3 },
+                    new Product { Name = "Moduł zapłonowy Delphi", 
+                        Description = "Moduł zapłonowy marki Delphi do silników z bezpośrednim wtryskiem", 
+                        Price = 299.99M, StockQuantity = 7, CategoryId = 3 },
+                    new Product { Name = "Tłumik końcowy Akrapovic", 
+                        Description = "Tłumik końcowy marki Akrapovic do samochodów sportowych", 
+                        Price = 1399.99M, StockQuantity = 3, CategoryId = 4 }
+                };
+                _context.Products.AddRange(products);
                 _context.SaveChanges();
             }
+        }
+
+        private void SeedRoles()
+        {
             if (!_context.Roles.Any())
             {
-                var result = GetRoles();
-                _context.AddRange(result);
-                _context.SaveChanges();
-            }
-            if(!_context.Users.Any())
-            {
-                var result = GetUsers();
-                _context.AddRange(result);
-                _context.SaveChanges();
-            }
-            //if (!_context.CartItems.Any())
-            //{
-            //    var result = GetCartItems();
-            //    _context.AddRange(result);
-            //    _context.SaveChanges();
-            //}
-        }
-        //private IEnumerable<CartItem> GetCartItems()
-        //{
-        //    var cartItems = new List<CartItem>
-        //    {
-        //        new CartItem
-        //        {
-        //            Quantity = 2,
-        //            ProductId = 8,
-        //            UserId = 14
-        //        },
-        //        new CartItem
-        //        {
-        //            Quantity = 3,
-        //            ProductId = 9,
-        //            UserId = 15
-        //        },
-
-        //    };
-
-        //    return cartItems;
-        //}
-
-
-        public List<User> GetUsers()
-        {
-            var users = new List<User>
-            {
-                new User
+                var roles = new List<Role>
                 {
-                    Email = "john.doe@example.com",
-                    PasswordHash = "hashed_password_1",
-                    FirstName = "John",
-                    LastName = "Doe",
+                    new Role { Name = "Admin" },
+                    new Role { Name = "User" }
+                };
+                _context.Roles.AddRange(roles);
+                _context.SaveChanges();
+            }
+        }
+
+        private void SeedUsers()
+        {
+            if (!_context.Users.Any())
+            {
+                var admin = new User
+                {
+                    Email = "admin@admin.com",
+                    FirstName = "Admin",
+                    LastName = "Admin",
+                    DateOfBirth = new DateTime(1980, 1, 1),
+                    RoleId = 1, 
+                    Address = new Address
+                    {
+                        City = "Warsaw",
+                        Street = "Admin St",
+                        PostalCode = "00-111"
+                    }
+                };
+                admin.PasswordHash = _passwordHasher.HashPassword(admin, "admin123");
+
+                var user = new User
+                {
+                    Email = "user@user.com",
+                    FirstName = "Regular",
+                    LastName = "User",
                     DateOfBirth = new DateTime(1990, 5, 15),
                     RoleId = 2,
                     Address = new Address
                     {
-                        City = "Warsaw",
-                        Street = "Main St",
-                        PostalCode = "00-123"
-                    }
-                },
-                new User
-                {
-                    Email = "jane.smith@example.com",
-                    PasswordHash = "hashed_password_2",
-                    FirstName = "Jane",
-                    LastName = "Smith",
-                    DateOfBirth = new DateTime(1985, 8, 25),
-                    RoleId = 3,
-                    Address = new Address
-                    {
                         City = "Krakow",
-                        Street = "Second St",
-                        PostalCode = "30-456"
+                        Street = "User St",
+                        PostalCode = "30-222"
                     }
-                },
-                new User
-                {
-                    Email = "alice.johnson@example.com",
-                    PasswordHash = "hashed_password_3",
-                    FirstName = "Alice",
-                    LastName = "Johnson",
-                    DateOfBirth = new DateTime(1988, 3, 10),
-                    RoleId = 1,
-                    Address = new Address
-                    {
-                        City = "Poznan",
-                        Street = "Third St",
-                        PostalCode = "61-789"
-                    }
-                },
-                new User
-                {
-                    Email = "robert.wilson@example.com",
-                    PasswordHash = "hashed_password_4",
-                    FirstName = "Robert",
-                    LastName = "Wilson",
-                    DateOfBirth = new DateTime(1995, 11, 8),
-                    RoleId = 3,
-                    Address = new Address
-                    {
-                        City = "Wroclaw",
-                        Street = "Fourth St",
-                        PostalCode = "50-234"
-                    }
-                },
-                new User
-                {
-                    Email = "emily.brown@example.com",
-                    PasswordHash = "hashed_password_5",
-                    FirstName = "Emily",
-                    LastName = "Brown",
-                    DateOfBirth = new DateTime(1980, 7, 20),
-                    RoleId = 2,
-                    Address = new Address
-                    {
-                        City = "Lodz",
-                        Street = "Fifth St",
-                        PostalCode = "90-567"
-                    }
-                }
-            };
-            return users;
+                };
+                user.PasswordHash = _passwordHasher.HashPassword(user, "user1234");
+                _context.Users.AddRange(admin, user);
+                _context.SaveChanges();
+            }
         }
-        private IEnumerable<Role> GetRoles()
-        {
-            var roles = new List<Role>
-            {
-                new Role
-                {
-                    Name = "Admin"
-                },
-                new Role
-                {
-                    Name = "Manager"
-                },
-                new Role
-                {
-                    Name = "User"
-                }
-            };
-            return roles;
-        }
-        private IEnumerable<Category> GetCategories()
-        {
-            var categories = new List<Category>
-            {
-                new Category { Name = "Filtry oleju",
-                               Products = new List<Product>() 
-                               {
-                                    new Product
-                                    {
-                                        Name = "Filtr olejowy Bosch",
-                                        Description = "Filtr olejowy marki Bosch do samochodów osobowych",
-                                        Price = 49.99M,
-                                        StockQuantity = 10,
-                                        CategoryId = 1
-                                    },
-                                    new Product
-                                    {
-                                        Name = "Filtr powietrza Mann-Filter",
-                                        Description = "Filtr powietrza marki Mann-Filter do samochodów SUV",
-                                        Price = 59.99M,
-                                        StockQuantity = 8,
-                                        CategoryId = 1
-                                    },
-                                }
-                },
-                new Category { Name = "Klocki hamulcowe" },
-                new Category { Name = "Tarcze hamulcowe" },
-                new Category { Name = "Świece zapłonowe" },
-                new Category { Name = "Paski rozrządu" },
-                new Category { Name = "Opony" },
-                new Category { Name = "Amortyzatory" },
-                new Category { Name = "Akumulatory" },
-                new Category { Name = "Oleje silnikowe" },
-                new Category { Name = "Części karoserii" }
-            };
-
-            return categories;
-        }
-
-        private IEnumerable<Product> GetProducts()
-        {
-            var products = new List<Product>
-            {
-                new Product { Name = "Filtr olejowy Bosch", Description = "Filtr olejowy marki Bosch do samochodów osobowych", Price = 49.99M, StockQuantity = 10, CategoryId = 1 },
-                new Product { Name = "Filtr powietrza Mann-Filter", Description = "Filtr powietrza marki Mann-Filter do samochodów SUV", Price = 59.99M, StockQuantity = 8, CategoryId = 1 },
-
-                new Product { Name = "Klocki hamulcowe Brembo", Description = "Klocki hamulcowe marki Brembo do samochodów sportowych", Price = 129.99M, StockQuantity = 15, CategoryId = 2 },
-                new Product { Name = "Tarcza hamulcowa ATE", Description = "Tarcza hamulcowa marki ATE o średnicy 280mm", Price = 199.99M, StockQuantity = 5, CategoryId = 2 },
-
-                new Product { Name = "Świeca zapłonowa NGK", Description = "Świeca zapłonowa marki NGK do silników benzynowych", Price = 14.99M, StockQuantity = 20, CategoryId = 3 },
-                new Product { Name = "Moduł zapłonowy Delphi", Description = "Moduł zapłonowy marki Delphi do silników z bezpośrednim wtryskiem", Price = 299.99M, StockQuantity = 7, CategoryId = 3 },
-                
-                new Product { Name = "Tłumik końcowy Akrapovic", Description = "Tłumik końcowy marki Akrapovic do samochodów sportowych", Price = 1399.99M, StockQuantity = 3, CategoryId = 4 },
-            };
-
-            return products;
-        }
-
     }
 }

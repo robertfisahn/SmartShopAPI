@@ -49,7 +49,6 @@ namespace SmartShopAPI.Controllers
         {
             var productId = _productService.Create(categoryId, dto);
             return Created($"category/{categoryId}/product/{productId}", null);
-            //return CreatedAtRoute("CreateProduct", new { id = product.Id }, product);
         }
 
         [HttpDelete("{productId}")]
@@ -57,7 +56,7 @@ namespace SmartShopAPI.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public ActionResult Delete([FromRoute]int categoryId, [FromRoute]int productId)
+        public ActionResult Delete([FromRoute]int categoryId, [FromRoute]int productId) 
         {
             _productService.Delete(categoryId, productId);
             return NoContent();
