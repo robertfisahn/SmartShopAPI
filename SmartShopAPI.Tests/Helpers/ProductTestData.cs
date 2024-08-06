@@ -1,10 +1,25 @@
-﻿using SmartShopAPI.Models.Dtos;
+﻿using SmartShopAPI.Models;
+using SmartShopAPI.Models.Dtos;
 using SmartShopAPI.Models.Dtos.Product;
+using System.Diagnostics.Contracts;
 
 namespace SmartShopAPI.Tests.Helpers
 {
     public class ProductTestData
     {
+        public static List<Category> Categories => new()
+            {
+                new Category { Id = 1, Name = "Electronics" },
+            };
+
+        public static List<Product> Products => new List<Product>
+        {
+            new Product { Name = "Product1", Description = "Description for Product1", Price = 10.00M, StockQuantity = 100, CategoryId = 1 },
+            new Product { Name = "Product2", Description = "Description for Product2", Price = 20.00M, StockQuantity = 150, CategoryId = 1 },
+            new Product { Name = "Product3", Description = "Description for Product3", Price = 30.00M, StockQuantity = 200, CategoryId = 1 },
+            new Product { Name = "Product4", Description = "Description for Product4", Price = 40.00M, StockQuantity = 250, CategoryId = 1 }
+        };
+
         public static QueryParams QueryParams => 
             new ()
             {

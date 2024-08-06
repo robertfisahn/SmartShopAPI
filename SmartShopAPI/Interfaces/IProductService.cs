@@ -8,10 +8,10 @@ namespace SmartShopAPI.Interfaces
 {
     public interface IProductService
     {
-        int Create(int categoryId, CreateProductDto dto);
-        void Delete(int categoryId, int productId);
-        PagedResult<ProductDto> Get(int categoryId, QueryParams query);
-        ProductDto GetById(int categoryId, int productId);
-        void Update(int productId, UpdateProductDto dto);
+        Task<int> CreateAsync(int categoryId, CreateProductDto dto);
+        Task DeleteAsync(int categoryId, int productId);
+        Task<PagedResult<ProductDto>> GetAsync(int categoryId, QueryParams query);
+        Task<ProductDto> GetByIdAsync(int categoryId, int productId);
+        Task UpdateAsync(int productId, UpdateProductDto dto);
     }
 }

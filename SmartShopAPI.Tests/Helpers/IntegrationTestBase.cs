@@ -23,7 +23,7 @@ namespace SmartShopAPI.Tests.IntegrationTests
                     {
                         var dbContextOptions = services
                             .SingleOrDefault(service => service.ServiceType == typeof(DbContextOptions<SmartShopDbContext>));
-                        if (dbContextOptions != null)
+                        if (dbContextOptions != null)   
                         {
                             services.Remove(dbContextOptions);
                         }

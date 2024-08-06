@@ -5,7 +5,7 @@ using SmartShopAPI.Exceptions;
 using SmartShopAPI.Models.Dtos.Product;
 using SmartShopAPI.Interfaces;
 using SmartShopAPI.Models.Dtos;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartShopAPI.Services
 {
@@ -20,11 +20,11 @@ namespace SmartShopAPI.Services
             _mapper = mapper;
         }
 
-        public PagedResult<ProductDto> Get(int categoryId, QueryParams query)
+        public async Task<PagedResult<ProductDto>> GetAsync(int categoryId, QueryParams query)
         {
-            CheckCategory(categoryId);
+            await CheckCategory(categoryId);
 
-            var filteredProducts = FilterProducts(categoryId, query.SearchPhrase);
+            var filteredProducts = await FilterProducts(categoryId, query.SearchPhrase);
             var paginatedAndSortedProducts = PaginateProducts(SortProducts(filteredProducts, query.SortOrder, query.SortBy),
                 query.PageSize, query.PageNumber);
 
@@ -32,81 +32,80 @@ namespace SmartShopAPI.Services
             return new PagedResult<ProductDto>(dtos, filteredProducts.Count(), query.PageSize, query.PageNumber);
         }
 
-        public ProductDto GetById(int categoryId, int productId)
+        public async Task<ProductDto> GetByIdAsync(int categoryId, int productId)
         {
-            CheckCategory(categoryId);
-            var product = _context.Products
+            await CheckCategory(categoryId);
+            var product = await _context.Products
                 .Where(x => x.CategoryId == categoryId)
-                .FirstOrDefault(x => x.Id == productId) ?? throw new NotFoundException("Product not found");
+                .FirstOrDefaultAsync(x => x.Id == productId) ?? throw new NotFoundException("Product not found");
 
             return _mapper.Map<ProductDto>(product);
         }
 
-        public int Create(int categoryId, CreateProductDto dto)
+        public async Task<int> CreateAsync(int categoryId, CreateProductDto dto)
         {
-            CheckCategory(categoryId);
+            await CheckCategory(categoryId);
             var product = _mapper.Map<Product>(dto);
             product.CategoryId = categoryId;
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
             return product.Id;
         }
 
-        public void Delete(int categoryId, int productId)
+        public async Task DeleteAsync(int categoryId, int productId)
         {
-            CheckCategory(categoryId);
-            var product = _context.Products
+            await CheckCategory(categoryId);
+            var product = await _context.Products
                 .Where(x => x.CategoryId == categoryId)
-                .FirstOrDefault(p => p.Id == productId) ?? throw new NotFoundException("Product not found");
+                .FirstOrDefaultAsync(p => p.Id == productId) ?? throw new NotFoundException("Product not found");
             _context.Products.Remove(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Update(int productId, UpdateProductDto dto)
+        public async Task UpdateAsync(int productId, UpdateProductDto dto)
         {
-            var product = _context.Products
-                .FirstOrDefault(x => x.Id == productId) ?? throw new NotFoundException("Product not found");
+            var product = await _context.Products
+                .FirstOrDefaultAsync(x => x.Id == productId) ?? throw new NotFoundException("Product not found");
             _mapper.Map(dto, product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void CheckCategory(int categoryId)
+        public async Task CheckCategory(int categoryId)
         {
-            if(!_context.Categories.Any(x => x.Id == categoryId))
+            if(!await _context.Categories.AnyAsync(x => x.Id == categoryId))
             {
                 throw new NotFoundException("Category not found");
             }
         }
 
-        public IQueryable<Product> FilterProducts(int categoryId, string searchPhrase)
+        public async Task<List<Product>> FilterProducts(int categoryId, string? searchPhrase)
         {
-            CheckCategory(categoryId);
-            var products = _context.Products
-                .Where(x => x.CategoryId == categoryId && (searchPhrase == null || x.Name.ToLower()
-                .Contains(searchPhrase.ToLower())));
+            var products = await _context.Products
+                .Where(x => x.CategoryId == categoryId && (searchPhrase == null || x.Name.ToLower().Contains(searchPhrase.ToLower())))
+                .ToListAsync();
             return products;
         }
 
-        public IQueryable<Product> SortProducts(IQueryable<Product> products, SortOrder sortOrder, string sortBy)
+        public List<Product> SortProducts(List<Product> products, SortOrder sortOrder, string sortBy)
         {
             if (!string.IsNullOrEmpty(sortBy))
             {
-                var columnSelector = new Dictionary<string, Expression<Func<Product, object>>>
-                {
-                    { nameof(Product.Name), r => r.Name },
-                    { nameof(Product.Price), r => r.Price }
-                };
+                var columnSelector = new Dictionary<string, Func<Product, object>>
+        {
+            { nameof(Product.Name), r => r.Name },
+            { nameof(Product.Price), r => r.Price }
+        };
 
                 var selectedColumn = columnSelector[sortBy];
 
                 products = sortOrder == SortOrder.Ascending
-                    ? products.OrderBy(selectedColumn)
-                    : products.OrderByDescending(selectedColumn);
+                    ? products.OrderBy(selectedColumn).ToList()
+                    : products.OrderByDescending(selectedColumn).ToList();
             }
             return products;
         }
 
-        public List<Product> PaginateProducts(IQueryable<Product> products, int pageSize, int pageNumber)
+        public List<Product> PaginateProducts(List<Product> products, int pageSize, int pageNumber)
         {
             var result = products
                 .Skip(pageSize * (pageNumber - 1))

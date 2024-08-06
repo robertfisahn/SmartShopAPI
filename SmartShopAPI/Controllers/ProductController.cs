@@ -23,9 +23,9 @@ namespace SmartShopAPI.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult<IEnumerable<ProductDto>> Get([FromRoute]int categoryId, [FromQuery]QueryParams query)
+        public async Task<ActionResult<IEnumerable<ProductDto>>> Get([FromRoute]int categoryId, [FromQuery]QueryParams query)
         {
-            var products = _productService.Get(categoryId, query);
+            var products = await _productService.GetAsync(categoryId, query);
             return Ok(products);
         }
 
@@ -33,9 +33,9 @@ namespace SmartShopAPI.Controllers
         [AllowAnonymous]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public ActionResult<ProductDto> GetById([FromRoute]int categoryId, [FromRoute]int productId)
+        public async Task<ActionResult<ProductDto>> GetById([FromRoute]int categoryId, [FromRoute]int productId)
         {
-            var product = _productService.GetById(categoryId, productId);
+            var product = await _productService.GetByIdAsync(categoryId, productId);
             return Ok(product);
         }
 
@@ -45,9 +45,9 @@ namespace SmartShopAPI.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public ActionResult Create([FromRoute]int categoryId, [FromBody]CreateProductDto dto)
+        public async Task<ActionResult> Create([FromRoute]int categoryId, [FromBody]CreateProductDto dto)
         {
-            var productId = _productService.Create(categoryId, dto);
+            var productId = await _productService.CreateAsync(categoryId, dto);
             return Created($"category/{categoryId}/product/{productId}", null);
         }
 
@@ -56,9 +56,9 @@ namespace SmartShopAPI.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public ActionResult Delete([FromRoute]int categoryId, [FromRoute]int productId) 
+        public async Task<ActionResult> Delete([FromRoute]int categoryId, [FromRoute]int productId) 
         {
-            _productService.Delete(categoryId, productId);
+            await _productService.DeleteAsync(categoryId, productId);
             return NoContent();
         }
 
@@ -68,9 +68,9 @@ namespace SmartShopAPI.Controllers
         [ProducesResponseType(401)]
         [ProducesResponseType(403)]
         [ProducesResponseType(404)]
-        public ActionResult Update([FromRoute]int productId, UpdateProductDto dto)
+        public async Task<ActionResult> Update([FromRoute]int productId, UpdateProductDto dto)
         {
-            _productService.Update(productId, dto);
+            await _productService.UpdateAsync(productId, dto);
             return NoContent();
         }
     }
