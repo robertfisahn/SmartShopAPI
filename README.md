@@ -10,7 +10,10 @@ SmartShopAPI is a straightforward application operating as an online shop. It al
 * JWT Authentication (JWTBearer)  
 * Data Transfer Object (DTO)  
 * AutoMapper  
-* Swagger  
+* Swagger
+* xUnit
+* EF Core InMemory
+* FluentAssertions  
 
 # Database Diagram  
 ![scheme](https://github.com/user-attachments/assets/417d8875-6f48-48fb-8e73-4a2af92df886)
