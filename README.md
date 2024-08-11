@@ -13,7 +13,7 @@ SmartShopAPI is a straightforward application operating as an online shop. It al
 * Swagger  
 
 # Database Diagram  
-![DatabaseScheme](scheme.png)
+![scheme](https://github.com/user-attachments/assets/417d8875-6f48-48fb-8e73-4a2af92df886)
 
 # Endpoints
 
@@ -48,4 +48,4 @@ SmartShopAPI is a straightforward application operating as an online shop. It al
 
 
 # Swagger
- ![Swagger](swagger.png)
+![swagger](https://github.com/user-attachments/assets/478fcb48-a802-4cea-b58e-4c3bbc4a54c5)
